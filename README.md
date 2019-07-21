@@ -1,4 +1,4 @@
-# graphql [![GoDoc](https://godoc.org/github.com/machinebox/graphql?status.png)](http://godoc.org/github.com/machinebox/graphql) [![Build Status](https://travis-ci.org/machinebox/graphql.svg?branch=master)](https://travis-ci.org/machinebox/graphql) [![Go Report Card](https://goreportcard.com/badge/github.com/machinebox/graphql)](https://goreportcard.com/report/github.com/machinebox/graphql)
+# gql [![GoDoc](https://godoc.org/github.com/ddspog/gql?status.png)](http://godoc.org/github.com/ddspog/gql) [![Build Status](https://travis-ci.org/ddspog/gql.svg?branch=master)](https://travis-ci.org/ddspog/gql) [![Go Report Card](https://goreportcard.com/badge/github.com/ddspog/gql)](https://goreportcard.com/report/github.com/ddspog/gql)
 
 Low-level GraphQL client for Go.
 
@@ -10,10 +10,10 @@ Low-level GraphQL client for Go.
 * Simple error handling
 
 ## Installation
-Make sure you have a working Go environment. To install graphql, simply run:
+Make sure you have a working Go environment. To install gql, simply run:
 
 ```
-$ go get github.com/machinebox/graphql
+$ go get github.com/ddspog/gql
 ```
 
 ## Usage
@@ -22,10 +22,10 @@ $ go get github.com/machinebox/graphql
 import "context"
 
 // create a client (safe to share across requests)
-client := graphql.NewClient("https://machinebox.io/graphql")
+client := gql.NewClient("https://machinebox.io/graphql")
 
 // make a request
-req := graphql.NewRequest(`
+req := gql.NewRequest(`
     query ($key: String!) {
         items (id:$key) {
             field1
@@ -57,10 +57,10 @@ By default, the package will send a JSON body. To enable the sending of files, y
 use multipart form data instead using the `UseMultipartForm` option when you create your `Client`:
 
 ```
-client := graphql.NewClient("https://machinebox.io/graphql", graphql.UseMultipartForm())
+client := gql.NewClient("https://machinebox.io/graphql", gql.UseMultipartForm())
 ```
 
-For more information, [read the godoc package documentation](http://godoc.org/github.com/machinebox/graphql) or the [blog post](https://blog.machinebox.io/a-graphql-client-library-for-go-5bffd0455878).
+For more information, [read the godoc package documentation](http://godoc.org/github.com/ddspog/gql) or the [blog post](https://blog.machinebox.io/a-graphql-client-library-for-go-5bffd0455878).
 
 ## Thanks
 
