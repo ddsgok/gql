@@ -10,10 +10,11 @@ Low-level GraphQL client for Go.
 * Simple error handling
 
 ## Installation
+
 Make sure you have a working Go environment. To install gql, simply run:
 
-```
-$ go get github.com/ddspog/gql
+```bash
+go get github.com/ddspog/gql
 ```
 
 ## Usage
@@ -22,7 +23,7 @@ $ go get github.com/ddspog/gql
 import "context"
 
 // create a client (safe to share across requests)
-client := gql.NewClient("https://machinebox.io/graphql")
+client := gql.NewClient("https://machinebox.io/gql")
 
 // make a request
 req := gql.NewRequest(`
@@ -51,13 +52,16 @@ if err := client.Run(ctx, req, &respData); err != nil {
 }
 ```
 
+Read [graphql.queries](https://graphql.org/learn/queries/#variables) to understand how to
+use variables.
+
 ### File support via multipart form data
 
 By default, the package will send a JSON body. To enable the sending of files, you can opt to
 use multipart form data instead using the `UseMultipartForm` option when you create your `Client`:
 
-```
-client := gql.NewClient("https://machinebox.io/graphql", gql.UseMultipartForm())
+```go
+client := gql.NewClient("https://machinebox.io/gql", gql.UseMultipartForm())
 ```
 
 For more information, [read the godoc package documentation](http://godoc.org/github.com/ddspog/gql) or the [blog post](https://blog.machinebox.io/a-graphql-client-library-for-go-5bffd0455878).
