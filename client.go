@@ -1,34 +1,4 @@
-// Package graphql provides a low level GraphQL client.
-//
-//  // create a client (safe to share across requests)
-//  client := graphql.NewClient("https://machinebox.io/graphql")
-//
-//  // make a request
-//  req := graphql.NewRequest(`
-//      query ($key: String!) {
-//          items (id:$key) {
-//              field1
-//              field2
-//              field3
-//          }
-//      }
-//  `)
-//
-//  // set any variables
-//  req.Var("key", "value")
-//
-//  // run it and capture the response
-//  var respData ResponseStruct
-//  if err := client.Run(ctx, req, &respData); err != nil {
-//      log.Fatal(err)
-//  }
-//
-// Specify client
-//
-// To specify your own http.Client, use the WithHTTPClient option:
-//  httpclient := &http.Client{}
-//  client := graphql.NewClient("https://machinebox.io/graphql", graphql.WithHTTPClient(httpclient))
-package graphql
+package gql
 
 import (
 	"bytes"
@@ -76,12 +46,21 @@ func (c *Client) logf(format string, args ...interface{}) {
 	c.Log(fmt.Sprintf(format, args...))
 }
 
-// Run executes the query and unmarshals the response from the data field
-// into the response object.
+func (c *Client) Run(ctx context.Context, req *Request) (Response, error) {
+	var resp interface{}
+	if err := c.RunWithSpecialResp(ctx, req, &resp); err != nil {
+		return emptyResponse(), err
+	}
+
+	return ParseResponse(resp)
+}
+
+// RunWithSpecialResp executes the query and unmarshals the response from the
+// data field into the response object.
 // Pass in a nil response object to skip response parsing.
 // If the request fails or the server returns an error, the first error
 // will be returned.
-func (c *Client) Run(ctx context.Context, req *Request, resp interface{}) error {
+func (c *Client) RunWithSpecialResp(ctx context.Context, req *Request, resp interface{}) error {
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -105,9 +84,11 @@ func (c *Client) runWithJSON(ctx context.Context, req *Request, resp interface{}
 		Query:     req.q,
 		Variables: req.vars,
 	}
+
 	if err := json.NewEncoder(&requestBody).Encode(requestBodyObj); err != nil {
 		return errors.Wrap(err, "encode body")
 	}
+
 	c.logf(">> variables: %v", req.vars)
 	c.logf(">> query: %s", req.q)
 	gr := &graphResponse{
@@ -139,7 +120,7 @@ func (c *Client) runWithJSON(ctx context.Context, req *Request, resp interface{}
 	c.logf("<< %s", buf.String())
 	if err := json.NewDecoder(&buf).Decode(&gr); err != nil {
 		if res.StatusCode != http.StatusOK {
-			return fmt.Errorf("graphql: server returned a non-200 status code: %v", res.StatusCode)
+			return fmt.Errorf("gql: server returned a non-200 status code: %v", res.StatusCode)
 		}
 		return errors.Wrap(err, "decoding response")
 	}
@@ -210,7 +191,7 @@ func (c *Client) runWithPostFields(ctx context.Context, req *Request, resp inter
 	c.logf("<< %s", buf.String())
 	if err := json.NewDecoder(&buf).Decode(&gr); err != nil {
 		if res.StatusCode != http.StatusOK {
-			return fmt.Errorf("graphql: server returned a non-200 status code: %v", res.StatusCode)
+			return fmt.Errorf("gql: server returned a non-200 status code: %v", res.StatusCode)
 		}
 		return errors.Wrap(err, "decoding response")
 	}
@@ -221,104 +202,15 @@ func (c *Client) runWithPostFields(ctx context.Context, req *Request, resp inter
 	return nil
 }
 
-// WithHTTPClient specifies the underlying http.Client to use when
-// making requests.
-//  NewClient(endpoint, WithHTTPClient(specificHTTPClient))
-func WithHTTPClient(httpclient *http.Client) ClientOption {
-	return func(client *Client) {
-		client.httpClient = httpclient
-	}
-}
-
-// UseMultipartForm uses multipart/form-data and activates support for
-// files.
-func UseMultipartForm() ClientOption {
-	return func(client *Client) {
-		client.useMultipartForm = true
-	}
-}
-
-//ImmediatelyCloseReqBody will close the req body immediately after each request body is ready
-func ImmediatelyCloseReqBody() ClientOption {
-	return func(client *Client) {
-		client.closeReq = true
-	}
-}
-
-// ClientOption are functions that are passed into NewClient to
-// modify the behaviour of the Client.
-type ClientOption func(*Client)
-
 type graphErr struct {
 	Message string
 }
 
 func (e graphErr) Error() string {
-	return "graphql: " + e.Message
+	return "gql: " + e.Message
 }
 
 type graphResponse struct {
 	Data   interface{}
 	Errors []graphErr
-}
-
-// Request is a GraphQL request.
-type Request struct {
-	q     string
-	vars  map[string]interface{}
-	files []File
-
-	// Header represent any request headers that will be set
-	// when the request is made.
-	Header http.Header
-}
-
-// NewRequest makes a new Request with the specified string.
-func NewRequest(q string) *Request {
-	req := &Request{
-		q:      q,
-		Header: make(map[string][]string),
-	}
-	return req
-}
-
-// Var sets a variable.
-func (req *Request) Var(key string, value interface{}) {
-	if req.vars == nil {
-		req.vars = make(map[string]interface{})
-	}
-	req.vars[key] = value
-}
-
-// Vars gets the variables for this Request.
-func (req *Request) Vars() map[string]interface{} {
-	return req.vars
-}
-
-// Files gets the files in this request.
-func (req *Request) Files() []File {
-	return req.files
-}
-
-// Query gets the query string of this request.
-func (req *Request) Query() string {
-	return req.q
-}
-
-// File sets a file to upload.
-// Files are only supported with a Client that was created with
-// the UseMultipartForm option.
-func (req *Request) File(fieldname, filename string, r io.Reader) {
-	req.files = append(req.files, File{
-		Field: fieldname,
-		Name:  filename,
-		R:     r,
-	})
-}
-
-// File represents a file to upload.
-type File struct {
-	Field string
-	Name  string
-	R     io.Reader
 }
