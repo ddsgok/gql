@@ -1,4 +1,4 @@
-# gql [![GoDoc](https://godoc.org/github.com/ddspog/gql?status.png)](http://godoc.org/github.com/ddspog/gql) [![Build Status](https://travis-ci.org/ddspog/gql.svg?branch=master)](https://travis-ci.org/ddspog/gql) [![Go Report Card](https://goreportcard.com/badge/github.com/ddspog/gql)](https://goreportcard.com/report/github.com/ddspog/gql)
+# gql [![GoDoc](https://godoc.org/github.com/ddsgok/gql?status.png)](http://godoc.org/github.com/ddsgok/gql) [![Build Status](https://travis-ci.org/ddsgok/gql.svg?branch=master)](https://travis-ci.org/ddsgok/gql) [![Go Report Card](https://goreportcard.com/badge/github.com/ddsgok/gql)](https://goreportcard.com/report/github.com/ddsgok/gql)
 
 Low-level GraphQL client for Go.
 
@@ -14,7 +14,7 @@ Low-level GraphQL client for Go.
 Make sure you have a working Go environment. To install gql, simply run:
 
 ```bash
-go get github.com/ddspog/gql
+go get github.com/ddsgok/gql
 ```
 
 ## Usage
@@ -64,7 +64,7 @@ use multipart form data instead using the `UseMultipartForm` option when you cre
 client := gql.NewClient("https://machinebox.io/gql", gql.UseMultipartForm())
 ```
 
-For more information, [read the godoc package documentation](http://godoc.org/github.com/ddspog/gql) or the [blog post](https://blog.machinebox.io/a-graphql-client-library-for-go-5bffd0455878).
+For more information, [read the godoc package documentation](http://godoc.org/github.com/ddsgok/gql) or the [blog post](https://blog.machinebox.io/a-graphql-client-library-for-go-5bffd0455878).
 
 ## Thanks
 
