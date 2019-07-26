@@ -10,6 +10,7 @@ type Request struct {
 	q     string
 	vars  map[string]interface{}
 	files []File
+	err   error
 
 	// Header represent any request headers that will be set
 	// when the request is made.
@@ -25,12 +26,36 @@ func NewRequest(q string) *Request {
 	return req
 }
 
+// AddHeader adds a new header to the Request.
+func (req *Request) AddHeader(key, val string) *Request {
+	req.Header.Add(key, val)
+	return req
+}
+
+// GetHeader gets a header of the Request.
+func (req *Request) GetHeader(key string) string {
+	return req.Header.Get(key)
+}
+
+// SetHeader sets a header to the Request.
+func (req *Request) SetHeader(key, val string) *Request {
+	req.Header.Set(key, val)
+	return req
+}
+
+// DelHeader deletes a header of the Request.
+func (req *Request) DelHeader(key string) *Request {
+	req.Header.Del(key)
+	return req
+}
+
 // Var sets a variable.
-func (req *Request) Var(key string, value interface{}) {
+func (req *Request) Var(key string, value interface{}) *Request {
 	if req.vars == nil {
 		req.vars = make(map[string]interface{})
 	}
 	req.vars[key] = value
+	return req
 }
 
 // Vars gets the variables for this Request.
@@ -48,7 +73,17 @@ func (req *Request) Query() string {
 	return req.q
 }
 
+// Report stores an error to report at Run.
+func (req *Request) Report(err error) *Request {
+	req.err = err
+	return req
+}
+
+// Run executes the Request with the global client.
 func (req *Request) Run() (Response, error) {
+	if req.err != nil {
+		return Response{}, req.err
+	}
 	return Run(req)
 }
 

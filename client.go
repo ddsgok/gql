@@ -64,6 +64,11 @@ func (c *Client) Run(ctx context.Context, req *Request) (Response, error) {
 // If the request fails or the server returns an error, the first error
 // will be returned.
 func (c *Client) RunWithSpecialResp(ctx context.Context, req *Request, resp interface{}) error {
+	// If request got a problem, show it
+	if req.err != nil {
+		return req.err
+	}
+
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
