@@ -46,6 +46,9 @@ func (c *Client) logf(format string, args ...interface{}) {
 	c.Log(fmt.Sprintf(format, args...))
 }
 
+// Run executes the query and returns the response from the
+// data field. If the request fails or the server returns an
+// error, the first error will be returned.
 func (c *Client) Run(ctx context.Context, req *Request) (Response, error) {
 	var resp interface{}
 	if err := c.RunWithSpecialResp(ctx, req, &resp); err != nil {
