@@ -7,14 +7,18 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+// Response is a JSON response to a GraphQL request.
 type Response gjson.Result
 
+// ParseResponse will receive a value and compile into a Response,
+// throwing any error if needed.
 func ParseResponse(val interface{}) (Response, error) {
+	var err error
 	if b, err := json.Marshal(val); err == nil {
 		return Response(gjson.Parse(string(b))), nil
-	} else {
-		return emptyResponse(), err
 	}
+
+	return emptyResponse(), err
 }
 
 func emptyResponse() Response {
